@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VRM SDK - Basic Example</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+    #container {
+      width: 100vw;
+      height: 100vh;
+    }
+    .controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 300px;
+    }
+    .controls h3 {
+      margin-top: 0;
+    }
+    .control-group {
+      margin-bottom: 15px;
+    }
+    .control-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+    .control-group input,
+    .control-group select,
+    .control-group button {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #444;
+      background: #222;
+      color: white;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .control-group button {
+      cursor: pointer;
+      background: #4CAF50;
+      border: none;
+      margin-top: 5px;
+    }
+    .control-group button:hover {
+      background: #45a049;
+    }
+    .control-group input[type="range"] {
+      padding: 0;
+    }
+    .status {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  
+  <div class="controls">
+    <h3>VRM SDK Controls</h3>
+    
+    <div class="control-group">
+      <label for="vrmUrl">VRM Model URL:</label>
+      <input type="text" id="vrmUrl" placeholder="Enter VRM URL">
+      <button onclick="loadVRM()">Load VRM</button>
+    </div>
+
+    <div class="control-group">
+      <label for="audioUrl">Audio URL for Lip Sync:</label>
+      <input type="text" id="audioUrl" placeholder="Enter audio URL">
+      <button onclick="startLipSync()">Start Lip Sync</button>
+      <button onclick="stopLipSync()">Stop Lip Sync</button>
+    </div>
+
+    <div class="control-group">
+      <label for="expression">Expression:</label>
+      <select id="expression" onchange="setExpression()">
+        <option value="">Select...</option>
+        <option value="happy">Happy</option>
+        <option value="sad">Sad</option>
+        <option value="angry">Angry</option>
+        <option value="surprised">Surprised</option>
+        <option value="neutral">Neutral</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="vowelTest">Test Vowel:</label>
+      <select id="vowelTest">
+        <option value="aa">AA (あ)</option>
+        <option value="e">E (え)</option>
+        <option value="ih">IH (い)</option>
+        <option value="oh">OH (お)</option>
+        <option value="ou">OU (う)</option>
+      </select>
+      <input type="range" id="vowelWeight" min="0" max="100" value="0" oninput="testVowel()">
+      <button onclick="runTestSequence()">Run Test Sequence</button>
+    </div>
+
+    <div class="control-group">
+      <label>Scene Options:</label>
+      <label style="font-size: 12px;">
+        <input type="checkbox" id="showGrid" checked onchange="toggleGrid()"> Show Grid
+      </label>
+      <label style="font-size: 12px;">
+        <input type="checkbox" id="autoRotate" onchange="toggleAutoRotate()"> Auto Rotate
+      </label>
+    </div>
+  </div>
+
+  <div class="status" id="status">
+    Status: Ready
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

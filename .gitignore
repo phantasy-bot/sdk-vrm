@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.d.ts
+*.d.ts.map
+
+# Development
+.DS_Store
+*.log
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Environment
+.env
+.env.local
+
+# Temporary files
+tmp/
+temp/
+
+# OS files
+Thumbs.db
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

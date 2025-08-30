@@ -1,0 +1,60 @@
+{
+  "name": "@phantasy/vrm-sdk",
+  "version": "0.1.0",
+  "description": "A powerful Three.js SDK for VRM avatar rendering, lip sync, and animations",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "test": "jest",
+    "lint": "eslint src --ext .ts,.tsx",
+    "example:basic": "vite examples/basic",
+    "example:react": "vite examples/react",
+    "example:lip-sync": "vite examples/lip-sync",
+    "example:mixamo": "vite examples/mixamo"
+  },
+  "keywords": [
+    "vrm",
+    "three.js",
+    "3d",
+    "avatar",
+    "lip-sync",
+    "animation",
+    "mixamo",
+    "webgl"
+  ],
+  "author": "Phantasy",
+  "license": "MIT",
+  "peerDependencies": {
+    "three": ">=0.160.0"
+  },
+  "dependencies": {
+    "@pixiv/three-vrm": "^3.1.0",
+    "three-stdlib": "^2.33.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.160.0",
+    "three": "^0.160.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "optionalDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phantasy-bot/sdk-vrm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/phantasy-bot/sdk-vrm/issues"
+  },
+  "homepage": "https://github.com/phantasy-bot/sdk-vrm#readme"
+}
