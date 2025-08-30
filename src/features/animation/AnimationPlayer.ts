@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { VRM } from '@pixiv/three-vrm';
-import { FBXLoader } from 'three-stdlib';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 export interface AnimationOptions {
   loop?: boolean;
@@ -42,7 +42,7 @@ export class AnimationPlayer {
           // Process and store animations
           clips.forEach((clip, index) => {
             const clipName = name || clip.name || `animation_${index}`;
-            
+
             // Retarget animation to VRM bones
             const retargetedClip = this.retargetAnimation(clip);
             this.animations.set(clipName, retargetedClip);
@@ -65,43 +65,43 @@ export class AnimationPlayer {
     // Create a map of Mixamo bone names to VRM bone names
     const boneMap: Record<string, string> = {
       // Mixamo -> VRM mapping
-      'mixamorigHips': 'hips',
-      'mixamorigSpine': 'spine',
-      'mixamorigSpine1': 'chest',
-      'mixamorigSpine2': 'upperChest',
-      'mixamorigNeck': 'neck',
-      'mixamorigHead': 'head',
-      
+      mixamorigHips: 'hips',
+      mixamorigSpine: 'spine',
+      mixamorigSpine1: 'chest',
+      mixamorigSpine2: 'upperChest',
+      mixamorigNeck: 'neck',
+      mixamorigHead: 'head',
+
       // Arms
-      'mixamorigLeftShoulder': 'leftShoulder',
-      'mixamorigLeftArm': 'leftUpperArm',
-      'mixamorigLeftForeArm': 'leftLowerArm',
-      'mixamorigLeftHand': 'leftHand',
-      'mixamorigRightShoulder': 'rightShoulder',
-      'mixamorigRightArm': 'rightUpperArm',
-      'mixamorigRightForeArm': 'rightLowerArm',
-      'mixamorigRightHand': 'rightHand',
-      
+      mixamorigLeftShoulder: 'leftShoulder',
+      mixamorigLeftArm: 'leftUpperArm',
+      mixamorigLeftForeArm: 'leftLowerArm',
+      mixamorigLeftHand: 'leftHand',
+      mixamorigRightShoulder: 'rightShoulder',
+      mixamorigRightArm: 'rightUpperArm',
+      mixamorigRightForeArm: 'rightLowerArm',
+      mixamorigRightHand: 'rightHand',
+
       // Legs
-      'mixamorigLeftUpLeg': 'leftUpperLeg',
-      'mixamorigLeftLeg': 'leftLowerLeg',
-      'mixamorigLeftFoot': 'leftFoot',
-      'mixamorigLeftToeBase': 'leftToes',
-      'mixamorigRightUpLeg': 'rightUpperLeg',
-      'mixamorigRightLeg': 'rightLowerLeg',
-      'mixamorigRightFoot': 'rightFoot',
-      'mixamorigRightToeBase': 'rightToes',
+      mixamorigLeftUpLeg: 'leftUpperLeg',
+      mixamorigLeftLeg: 'leftLowerLeg',
+      mixamorigLeftFoot: 'leftFoot',
+      mixamorigLeftToeBase: 'leftToes',
+      mixamorigRightUpLeg: 'rightUpperLeg',
+      mixamorigRightLeg: 'rightLowerLeg',
+      mixamorigRightFoot: 'rightFoot',
+      mixamorigRightToeBase: 'rightToes',
     };
 
     // Clone the clip and update track names
     const tracks: THREE.KeyframeTrack[] = [];
-    
+
     clip.tracks.forEach((track) => {
       // Extract bone name from track name
       const parts = track.name.split('.');
       const boneName = parts[0];
       const property = parts.slice(1).join('.');
-      
+
       // Check if we have a mapping for this bone
       let targetBoneName = boneName;
       for (const [mixamoName, vrmName] of Object.entries(boneMap)) {
@@ -110,28 +110,16 @@ export class AnimationPlayer {
           break;
         }
       }
-      
+
       // Create new track with VRM bone name
       const newTrackName = `${targetBoneName}.${property}`;
-      
+
       if (track instanceof THREE.QuaternionKeyframeTrack) {
-        tracks.push(new THREE.QuaternionKeyframeTrack(
-          newTrackName,
-          track.times,
-          track.values
-        ));
+        tracks.push(new THREE.QuaternionKeyframeTrack(newTrackName, track.times, track.values));
       } else if (track instanceof THREE.VectorKeyframeTrack) {
-        tracks.push(new THREE.VectorKeyframeTrack(
-          newTrackName,
-          track.times,
-          track.values
-        ));
+        tracks.push(new THREE.VectorKeyframeTrack(newTrackName, track.times, track.values));
       } else if (track instanceof THREE.NumberKeyframeTrack) {
-        tracks.push(new THREE.NumberKeyframeTrack(
-          newTrackName,
-          track.times,
-          track.values
-        ));
+        tracks.push(new THREE.NumberKeyframeTrack(newTrackName, track.times, track.values));
       }
     });
 
@@ -166,18 +154,16 @@ export class AnimationPlayer {
 
     // Create new action
     this.currentAction = this.mixer.clipAction(clip);
-    
+
     // Configure action
     if (options.loop !== undefined) {
-      this.currentAction.loop = options.loop 
-        ? THREE.LoopRepeat 
-        : THREE.LoopOnce;
+      this.currentAction.loop = options.loop ? THREE.LoopRepeat : THREE.LoopOnce;
     }
-    
+
     if (options.weight !== undefined) {
       this.currentAction.weight = options.weight;
     }
-    
+
     if (options.timeScale !== undefined) {
       this.currentAction.timeScale = options.timeScale;
     }
@@ -258,16 +244,18 @@ export class AnimationPlayer {
   createIdleAnimation(): THREE.AnimationClip {
     const times = [0, 1, 2];
     const values = [
-      0, 0, 0,    // Start position
-      0, 0.02, 0, // Slight up
-      0, 0, 0,    // Back to start
+      0,
+      0,
+      0, // Start position
+      0,
+      0.02,
+      0, // Slight up
+      0,
+      0,
+      0, // Back to start
     ];
 
-    const positionTrack = new THREE.VectorKeyframeTrack(
-      'hips.position',
-      times,
-      values
-    );
+    const positionTrack = new THREE.VectorKeyframeTrack('hips.position', times, values);
 
     return new THREE.AnimationClip('idle', 2, [positionTrack]);
   }
@@ -279,10 +267,22 @@ export class AnimationPlayer {
     const times = [0, 0.5, 1, 1.5];
     const values = new Float32Array([
       // Quaternion values for waving motion
-      0, 0, 0, 1,           // Start
-      0, 0, -0.3, 0.95,     // Wave left
-      0, 0, 0.3, 0.95,      // Wave right
-      0, 0, 0, 1,           // End
+      0,
+      0,
+      0,
+      1, // Start
+      0,
+      0,
+      -0.3,
+      0.95, // Wave left
+      0,
+      0,
+      0.3,
+      0.95, // Wave right
+      0,
+      0,
+      0,
+      1, // End
     ]);
 
     const rotationTrack = new THREE.QuaternionKeyframeTrack(

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { VRM, VRMLoaderPlugin } from '@pixiv/three-vrm';
-import { GLTFLoader } from 'three-stdlib';
-import { FBXLoader } from 'three-stdlib';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 export interface LoadingOptions {
   onProgress?: (progress: number) => void;
@@ -137,9 +137,7 @@ export class ResourceLoader {
   async loadVRMWithProxy(url: string, options?: LoadingOptions): Promise<VRM> {
     // Use CORS proxy in development
     const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-    const proxyUrl = isDevelopment 
-      ? `https://corsproxy.io/?${encodeURIComponent(url)}`
-      : url;
+    const proxyUrl = isDevelopment ? `https://corsproxy.io/?${encodeURIComponent(url)}` : url;
 
     return this.loadVRM(proxyUrl, options);
   }
@@ -164,7 +162,7 @@ export class ResourceLoader {
       if ((object as THREE.Mesh).isMesh) {
         const mesh = object as THREE.Mesh;
         mesh.geometry?.dispose();
-        
+
         if (Array.isArray(mesh.material)) {
           mesh.material.forEach((material) => material.dispose());
         } else if (mesh.material) {

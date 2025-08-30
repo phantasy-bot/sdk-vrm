@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three-stdlib';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 export interface SceneConfig {
   container: HTMLElement;
@@ -147,10 +147,7 @@ export class SceneManager {
       onFrame?.(delta);
 
       // Render
-      this.components!.renderer.render(
-        this.components!.scene,
-        this.components!.camera
-      );
+      this.components!.renderer.render(this.components!.scene, this.components!.camera);
     };
 
     animate();

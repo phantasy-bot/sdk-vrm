@@ -53,7 +53,7 @@ export class AudioAnalyzer {
     this.analyser.maxDecibels = this.config.maxDecibels;
 
     // Create source from audio element (reuse if same element)
-    if (!this.source || (this.source.mediaElement !== audioElement)) {
+    if (!this.source || this.source.mediaElement !== audioElement) {
       if (this.source) {
         this.source.disconnect();
       }
@@ -75,15 +75,16 @@ export class AudioAnalyzer {
     }
 
     // Get frequency data
-    this.analyser.getFloatFrequencyData(this.dataArray);
+    this.analyser.getFloatFrequencyData(this.dataArray as Float32Array);
 
     // Calculate volume (RMS of frequency data)
     let sum = 0;
     let count = 0;
     for (let i = 0; i < this.dataArray.length; i++) {
       if (this.dataArray[i] > this.config.minDecibels) {
-        const normalized = (this.dataArray[i] - this.config.minDecibels) / 
-                          (this.config.maxDecibels - this.config.minDecibels);
+        const normalized =
+          (this.dataArray[i] - this.config.minDecibels) /
+          (this.config.maxDecibels - this.config.minDecibels);
         sum += normalized * normalized;
         count++;
       }
@@ -115,17 +116,17 @@ export class AudioAnalyzer {
   }
 
   private calculateVowelWeights(
-    dominantFreq: number, 
+    dominantFreq: number,
     frequencies: Float32Array
   ): AudioAnalysisResult['vowelWeights'] {
     // Simplified vowel formant mapping
     // These are approximate formant frequencies for vowels
     const vowelFormants = {
-      aa: { f1: 700, f2: 1220 },  // "ah"
-      e: { f1: 530, f2: 1840 },   // "eh"
-      ih: { f1: 390, f2: 1990 },  // "ee"
-      oh: { f1: 570, f2: 840 },   // "oh"
-      ou: { f1: 370, f2: 950 },   // "oo"
+      aa: { f1: 700, f2: 1220 }, // "ah"
+      e: { f1: 530, f2: 1840 }, // "eh"
+      ih: { f1: 390, f2: 1990 }, // "ee"
+      oh: { f1: 570, f2: 840 }, // "oh"
+      ou: { f1: 370, f2: 950 }, // "oo"
     };
 
     const weights = {
@@ -140,7 +141,7 @@ export class AudioAnalyzer {
     for (const [vowel, formants] of Object.entries(vowelFormants)) {
       const f1Diff = Math.abs(dominantFreq - formants.f1);
       const f2Diff = Math.abs(dominantFreq - formants.f2);
-      
+
       // Weight based on proximity (closer = higher weight)
       const proximity = 1 / (1 + (f1Diff + f2Diff) / 1000);
       weights[vowel as keyof typeof weights] = proximity;
