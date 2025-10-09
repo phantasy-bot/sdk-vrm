@@ -1,6 +1,6 @@
 {
   "name": "@phantasy/vrm-sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A powerful Three.js SDK for VRM avatar rendering, lip sync, and animations",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -15,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --clean",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "build:types": "tsup src/index.ts --format cjs,esm --dts --clean",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "test": "jest",
@@ -23,7 +23,8 @@
     "example:basic": "vite examples/basic",
     "example:react": "vite examples/react",
     "example:lip-sync": "vite examples/lip-sync",
-    "example:mixamo": "vite examples/mixamo"
+    "example:mixamo": "vite examples/mixamo",
+    "prepare": "npm run build"
   },
   "keywords": [
     "vrm",
