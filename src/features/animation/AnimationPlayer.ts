@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { VRM } from '@pixiv/three-vrm';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
+import { resolveHumanoidFromMixamo } from './mixamoRigMap';
 
 export interface AnimationOptions {
   loop?: boolean;
@@ -62,38 +63,7 @@ export class AnimationPlayer {
    * Retarget Mixamo animation to VRM bones
    */
   private retargetAnimation(clip: THREE.AnimationClip): THREE.AnimationClip {
-    // Create a map of Mixamo bone names to VRM bone names
-    const boneMap: Record<string, string> = {
-      // Mixamo -> VRM mapping
-      mixamorigHips: 'hips',
-      mixamorigSpine: 'spine',
-      mixamorigSpine1: 'chest',
-      mixamorigSpine2: 'upperChest',
-      mixamorigNeck: 'neck',
-      mixamorigHead: 'head',
-
-      // Arms
-      mixamorigLeftShoulder: 'leftShoulder',
-      mixamorigLeftArm: 'leftUpperArm',
-      mixamorigLeftForeArm: 'leftLowerArm',
-      mixamorigLeftHand: 'leftHand',
-      mixamorigRightShoulder: 'rightShoulder',
-      mixamorigRightArm: 'rightUpperArm',
-      mixamorigRightForeArm: 'rightLowerArm',
-      mixamorigRightHand: 'rightHand',
-
-      // Legs
-      mixamorigLeftUpLeg: 'leftUpperLeg',
-      mixamorigLeftLeg: 'leftLowerLeg',
-      mixamorigLeftFoot: 'leftFoot',
-      mixamorigLeftToeBase: 'leftToes',
-      mixamorigRightUpLeg: 'rightUpperLeg',
-      mixamorigRightLeg: 'rightLowerLeg',
-      mixamorigRightFoot: 'rightFoot',
-      mixamorigRightToeBase: 'rightToes',
-    };
-
-    // Clone the clip and update track names
+    // Clone the clip and update track names to target the actual VRM nodes
     const tracks: THREE.KeyframeTrack[] = [];
 
     clip.tracks.forEach((track) => {
@@ -102,17 +72,42 @@ export class AnimationPlayer {
       const boneName = parts[0];
       const property = parts.slice(1).join('.');
 
-      // Check if we have a mapping for this bone
-      let targetBoneName = boneName;
-      for (const [mixamoName, vrmName] of Object.entries(boneMap)) {
-        if (boneName.includes(mixamoName)) {
-          targetBoneName = boneName.replace(mixamoName, vrmName);
-          break;
+      // Resolve humanoid bone name from Mixamo naming
+      const humanoidName = resolveHumanoidFromMixamo(boneName);
+      let targetNodeName: string | null = null;
+
+      if (humanoidName) {
+        const anyHumanoid = (this.vrm as any).humanoid;
+        try {
+          // Prefer normalized node names if available (three-vrm v3)
+          if (anyHumanoid?.getNormalizedBoneNode) {
+            const node = anyHumanoid.getNormalizedBoneNode(humanoidName);
+            targetNodeName = node?.name || null;
+          }
+          if (!targetNodeName && anyHumanoid?.getBoneNode) {
+            const node = anyHumanoid.getBoneNode(humanoidName);
+            targetNodeName = node?.name || null;
+          }
+        } catch {}
+
+        // As a fallback, scan scene graph heuristically
+        if (!targetNodeName) {
+          const regex = new RegExp(humanoidName, 'i');
+          (this.vrm.scene as any).traverse?.((obj: any) => {
+            if (!targetNodeName && obj?.name && regex.test(obj.name)) {
+              targetNodeName = obj.name;
+            }
+          });
         }
       }
 
-      // Create new track with VRM bone name
-      const newTrackName = `${targetBoneName}.${property}`;
+      // If we couldn't resolve a target node, skip this track to avoid spam
+      if (!targetNodeName) {
+        return;
+      }
+
+      // Create new track with the resolved VRM node name
+      const newTrackName = `${targetNodeName}.${property}`;
 
       if (track instanceof THREE.QuaternionKeyframeTrack) {
         tracks.push(new THREE.QuaternionKeyframeTrack(newTrackName, track.times, track.values));
